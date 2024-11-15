@@ -28,7 +28,7 @@ Usage
 
 ```
 Usage: ssdpd [-hnsvw] [-c FILE] [-d URL] [-i SEC] [-l LEVEL] [-m NAME] [-M URL]
-                      [-p URL] [-P FILE] [-r SEC] [-R NUM] [-t TTL] [-u UUID]
+                      [-p URL] [-P FILE] [-r SEC] [-R NUM] [-t TTL] [-u UUID] [-T ST]
                       [IFACE [IFACE ...]]
 
     -c FILE   Path to alternate ssdpd.cache to store and/or read the UUID
@@ -46,6 +46,7 @@ Usage: ssdpd [-hnsvw] [-c FILE] [-d URL] [-i SEC] [-l LEVEL] [-m NAME] [-M URL]
               The '%s' is replaced with the IP address.  Default: http://%s/
     -P FILE   Override PID file location, absolute path required
     -s        Use syslog, default unless running in foreground, -n
+    -T urn    Replace the default ST with urn.  Default: "urn:schemas-upnp-org:device:Basic:1"
     -t TTL    TTL for multicast frames, default 2, according to the UDA
     -u UUID   Custom UUID instead of auto-generating one
     -v        Show program version

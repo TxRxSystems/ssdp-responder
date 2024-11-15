@@ -33,6 +33,7 @@ char fname[128];
 char model[128];
 char modelNumber[128];
 char serialNumber[128];
+char ST[128];
 #ifdef MANUFACTURER_URL
 char  mfrurl[128] = MANUFACTURER_URL;
 #else
@@ -47,11 +48,12 @@ size_t ifnum;
 
 static char *supported_types[] = {
 	SSDP_ST_ALL,
-	"upnp:rootdevice",
-	"urn:schemas-upnp-org:device:Basic:1",
-	uuid,
+	"urn:txrx-com:device",
+	"urn:txrx-com:device:*",
 	NULL
 };
+
+static char fixedTypeString[] = "urn:schemas-upnp-org:device:Basic:1";
 
 volatile sig_atomic_t running = 1;
 volatile sig_atomic_t recheck = 1;
@@ -90,7 +92,7 @@ static void compose_response(char *type, char *host, char *buf, size_t len)
 		if (!strcmp(type, uuid))
 			type = NULL;
 		else
-			snprintf(usn, sizeof(usn), "%s::%s", uuid, type);
+			snprintf(usn, sizeof(usn), "%s", uuid );
 	}
 
 	if (!type)
@@ -162,6 +164,10 @@ static void send_message(struct ifsock *ifs, char *type, struct sockaddr *sa, so
 	ssize_t num;
 	int s;
 
+	/* Override type with our static type string */
+	type = ST;
+	
+
 	if (ifs->addr.sin_addr.s_addr == htonl(INADDR_ANY))
 		return;
 
@@ -175,8 +181,8 @@ static void send_message(struct ifsock *ifs, char *type, struct sockaddr *sa, so
 	if (ifs->addr.sin_addr.s_addr == htonl(INADDR_ANY))
 		return;
 
-	if (!strcmp(type, SSDP_ST_ALL))
-		type = NULL;
+	//if (!strcmp(type, SSDP_ST_ALL))
+	//	type = NULL;
 
 	memset(buf, 0, sizeof(buf));
 	if (sa)
@@ -238,6 +244,7 @@ static void ssdp_recv(int sd)
 			if (!type)
 				return;
 			type++;
+			while (isspace(*type))
 			while (isspace(*type))
 				type++;
 
@@ -614,7 +621,11 @@ int main(int argc, char *argv[])
 	int nlmon = 0;
 	int c;
 
-	while ((c = getopt(argc, argv, "c:d:D:f:hi:l:m:M:np:P:r:R:st:u:vwN:S:")) != EOF) {
+	// preload ST with fixedTypeString
+	strlcpy(ST, fixedTypeString, sizeof(ST));
+	printf("here\r\n");
+	// Get command line options
+	while ((c = getopt(argc, argv, "c:d:D:f:hi:l:m:M:np:P:r:R:st:u:vwN:S:T:")) != EOF) {
 		switch (c) {
 		case 'c':
 			cachefn = strdup(optarg);
@@ -636,6 +647,11 @@ int main(int argc, char *argv[])
             strlcpy(serialNumber, optarg, sizeof(model));
             break;
 
+		case 'T':
+			strlcpy(ST, optarg, sizeof(ST));
+			printf("T found %s, %s\r\n", optarg,ST);
+			break;
+
         case 'f':
             strlcpy(fname, optarg, sizeof(fname));
             break;
@@ -650,6 +666,7 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'l':
+			printf("l found\r\n");
 			log_level = log_str2lvl(optarg);
 			if (-1 == log_level)
 				return usage(1);
