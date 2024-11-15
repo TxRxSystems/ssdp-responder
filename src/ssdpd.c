@@ -92,7 +92,7 @@ static void compose_response(char *type, char *host, char *buf, size_t len)
 		if (!strcmp(type, uuid))
 			type = NULL;
 		else
-			snprintf(usn, sizeof(usn), "%s", uuid );
+			snprintf(usn, sizeof(usn), "%s::%s", uuid, type);
 	}
 
 	if (!type)
@@ -244,7 +244,6 @@ static void ssdp_recv(int sd)
 			if (!type)
 				return;
 			type++;
-			while (isspace(*type))
 			while (isspace(*type))
 				type++;
 
@@ -623,7 +622,7 @@ int main(int argc, char *argv[])
 
 	// preload ST with fixedTypeString
 	strlcpy(ST, fixedTypeString, sizeof(ST));
-	printf("here\r\n");
+
 	// Get command line options
 	while ((c = getopt(argc, argv, "c:d:D:f:hi:l:m:M:np:P:r:R:st:u:vwN:S:T:")) != EOF) {
 		switch (c) {
@@ -649,7 +648,6 @@ int main(int argc, char *argv[])
 
 		case 'T':
 			strlcpy(ST, optarg, sizeof(ST));
-			printf("T found %s, %s\r\n", optarg,ST);
 			break;
 
         case 'f':
@@ -666,7 +664,6 @@ int main(int argc, char *argv[])
 			break;
 
 		case 'l':
-			printf("l found\r\n");
 			log_level = log_str2lvl(optarg);
 			if (-1 == log_level)
 				return usage(1);

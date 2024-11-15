@@ -8,7 +8,7 @@ Requires=network-online.target
 [Service]
 Type=simple
 EnvironmentFile=-@SYSCONFDIR@/default/ssdpd
-ExecStart=/bin/ssdpd/ssdpd -n -w -i 900 -d http://%s:1900/ssdpd.xml -T urn:txrx-com:device:DASCollector:1 -s eth0
+ExecStart=/bin/ssdpd/ssdpd -n -w -i 900 -d http://%%s:1900/ssdpd.xml -T urn:txrx-com:device:DASCollector:1 -s eth0
 
 
 [Install]
